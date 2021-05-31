@@ -1,12 +1,9 @@
 package com.example.StartWithTextract.Documents;
-
-import com.example.StartWithTextract.ValidationAlgos.ValidatePassport;
+import com.example.StartWithTextract.ValidationAlgos.ValidateVotercard;
 import com.example.StartWithTextract.ValidationAlgos.ValidateWithJaroWrinkler;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
-
 public class VoterIdCard {
     private int ConfidenceLevel;
     private HashMap<String, Integer> keywords;
@@ -14,6 +11,7 @@ public class VoterIdCard {
     private String passportNumber;
     private ValidateWithJaroWrinkler jw;
     private boolean stateUsed;
+    private String voterId;
     public VoterIdCard() {
         this.ConfidenceLevel = 0;
         this.keywords = new HashMap<>();
@@ -22,65 +20,63 @@ public class VoterIdCard {
         this.stateUsed=false;
         this.jw = new ValidateWithJaroWrinkler();
     }
-
     public void analyzVoterIdKey(String text) {
         calculatePassportConditions(text);
     }
-
     public String getString() {
         return "Voter Id Card";
     }
-
     public int getConfidence() {
         return this.ConfidenceLevel;
     }
-
     private void calculatePassportConditions(String check) {
         check = check.replaceAll("\\s", "");
         String x = check.toUpperCase(Locale.ROOT);
         StringBuilder sb = new StringBuilder(x);
         checkAllSubstrings(sb);
     }
-
     private void checkAllSubstrings(StringBuilder sb) {
         for (int i = 0; i < sb.length(); i++) {
             for (int j = i + 1; j <= sb.length(); j++) {
                 StringBuilder xsubstr = new StringBuilder(sb.substring(i, j));
                 String text = xsubstr.toString();
-
-                String getc= jw.checkParticularSubstring(text,this.keywords,this.KeywordsDone,this.stateUsed);
-                if(getc.length()>0){
+                ValidateVotercard v=new ValidateVotercard();
+                if (text.length() == 10 &&!KeywordsDone.contains(voterId) && v.validate(text)) {
+                      KeywordsDone.add(voterId);
+                      this.ConfidenceLevel+=keywords.get(voterId);
+                }
+                else{
+                String getc = jw.checkParticularSubstring(text, this.keywords, this.KeywordsDone, this.stateUsed);
+                if (getc.length() > 0) {
 //                        System.out.println("PassPort Text Considered" +text +" "+getc);
-                    int cl=keywords.get(getc);
-                    if(cl==50 && this.stateUsed==true){
+                    int cl = keywords.get(getc);
+                    if (cl == 50 && this.stateUsed == true) {
                         break;
-                    }else if(cl==50) {
+                    } else if (cl == 50) {
                         this.stateUsed = true;
                     }
-                    this.ConfidenceLevel+=cl;
-                    System.out.println("Voter id text considered " + getc);
+                    this.ConfidenceLevel += cl;
+                    //  System.out.println("Voter id text considered " + getc);
                     this.KeywordsDone.add(getc);
                     break;
                 }
-
+            }
             }
         }
     }
     private void updateKeywords() {
         //*******************Front Side*******************//
-        this.keywords.put("IDENTITYCARD", 35);
-        this.keywords.put("ELECTIONCOMMISSIONOFINDIA", 50);
-        this.keywords.put("ELECTOR", 30);
-
+        this.voterId="voterid";
+        this.keywords.put(voterId,60);
+        this.keywords.put("IDENTITYCARD", 20);
+        this.keywords.put("ELECTIONCOMMISSIONOFINDIA",40);
+        this.keywords.put("ELECTOR", 40);
 //        ***************************************************
-
         keywords.put("CONSTITUENCY", 30);
         keywords.put("ELECTORALREGISTRATIONOFFICER", 40);
         keywords.put("ASSEMBLY", 10);
-
         fillstates();
     }
-
     private void fillstates() {
 
         keywords.put("ANDHRA PRADESH", 50);

@@ -1,91 +1,165 @@
 package com.example.StartWithTextract;
-
 import com.amazonaws.services.textract.model.Block;
 import com.example.StartWithTextract.AmazonTextract.MyTextract;
+import com.example.StartWithTextract.CombineImgaes.ImageConcat;
 import com.example.StartWithTextract.Documents.*;
+import nu.pattern.OpenCV;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Stream;
-
 @SpringBootApplication
 public class StartWithTextractApplication {
     static HashMap<String, HashMap<String, ArrayList<String>>> data;
     static MyTextract textract;
+    static ImageConcat imageConcat;
+    static String TempStoragePath;
     public static void main(String[] args) {
         SpringApplication.run(StartWithTextractApplication.class, args);
         textract=new MyTextract();
+        TempStoragePath="C:\\Users\\HP\\Desktop\\ZoomCar\\TempStorage\\tempimg.jpg";
         data = new HashMap<>();
-//        String[] paths = {"AadharData", "PassPort", "VoterCard", "DlData"};
-        String[] paths={"InvalidPictures"};
-        for (String path : paths) {
-            System.out.println(path);
-            try (Stream<Path> filePathStream = Files.walk(Paths.get("C:\\Users\\HP\\Desktop\\ZoomCar\\" + path))) {
-                filePathStream.forEach(filePath -> {
-                    if (Files.isRegularFile(filePath)) {
-                        iterate(filePath.toString());
+        imageConcat = new ImageConcat();
+        OpenCV.loadShared();
+        start();
+//        List<String> list=new ArrayList<>();
+//        list.add("C:\\Users\\HP\\Pictures\\DSC_0016");
+
+    }
+    private static void start(){
+        String[] paths = {"VoterCard","DlData","PassPort","AadharData"};
+        for(String path:paths){
+            String currpath="C:\\Users\\HP\\Desktop\\ZoomCar\\" + path;
+            File[] files = new File(currpath).listFiles();
+            for(int i=0;i<files.length;i++){
+                File[] subfile=new File(currpath+"\\"+files[i].getName()).listFiles();
+//                if(files[i].getName().equals("2543417")) continue;
+                System.out.println(files[i].getAbsolutePath());
+                List<String> locations=new ArrayList<>();
+                for(File iname:subfile){
+                    if(validFile(splitted(iname.getAbsolutePath()))){
+                        locations.add(iname.getAbsolutePath());
+                        System.out.println(iname.getAbsolutePath());
                     }
-                });
-            } catch (IOException e) {
-                e.printStackTrace();
+                }
+                if(locations.size()==2){
+                    iterateForImageConcatenation(locations,files[i].getName(),path);
+                }else if(locations.size()==1){
+                    iterate(locations.get(0));
+                }else if(locations.size()>2){
+                    String id=files[i].getName();
+                    HashMap<String,ArrayList<String>> map=data.getOrDefault(path,new HashMap<>());
+                    ArrayList<String> list=map.getOrDefault(id,new ArrayList<>());
+                    list.add("Need manual Checking ");
+                    map.put(id,list);
+                    data.put(path,map);
+                }
             }
         }
-//         callTextractandGetConfidence("C:\\Users\\HP\\Desktop\\ZoomCar\\DlData\\2555355\\image86.jpeg"," fdfdf","iamge86" );
         System.out.println(data);
     }
-    public static void iterate(String filePath) {
+    static int i=10;
+    private static void printBufferedImage(ByteBuffer img){
+
+        byte [] b =img.array();
+        ByteArrayInputStream in = new ByteArrayInputStream(b);
+
+
+
+        try {
+            BufferedImage image = ImageIO.read(in);
+            ImageIO.write(image, "jpeg", new File("C:\\Users\\HP\\Desktop\\ZoomCar\\ConcatenatedImages\\image"+i+".jpeg"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        i++;
+    }
+    private static void iterate(String filePath) {
         String[] arr = splitted(filePath);
         String id = arr[arr.length - 2];
         String file = arr[arr.length - 3];
         String name=arr[arr.length-1];
         if (validFile(arr)) {
             String document = callTextractandGetConfidence(filePath,id,name);
-            HashMap<String, ArrayList<String>> map = data.getOrDefault(file, new HashMap<>());
-            ArrayList<String> confList = map.getOrDefault(id, new ArrayList<>());
-            confList.add(document);
-            map.put(id, confList);
-            data.put(file, map);
+          updateMap(document,file,id);
         }
     }
-    public static String callTextractandGetConfidence(String path,String id,String name) {
+    private static void iterateForImageConcatenation(List<String> paths,String id,String file){
+        System.out.println("Checking for "+file+" "+id);
+        String ans=concatTheImages(paths,id);
+        updateMap(ans,file,id);
+
+    }
+    private static void updateMap(String ans,String file,String id){
+        HashMap<String, ArrayList<String>> map = data.getOrDefault(file, new HashMap<>());
+        ArrayList<String> confList = map.getOrDefault(id, new ArrayList<>());
+        confList.add(ans);
+        map.put(id, confList);
+        data.put(file, map);
+    }
+    private static String concatTheImages(List<String> locations,String id){
+        ImageConcat c=new ImageConcat();
+          ByteBuffer concatenatedImg=c.concat(locations);
+          System.out.println(concatenatedImg);
+          return callTextractwithBufferImage(concatenatedImg,id);
+    }
+    private static String concatWriteDelete(List<String> locations,String id){
+//        String img="\\tempimg.jpeg";
+        ByteBuffer concatenatedImg=imageConcat.concat(locations);
+        // write the image at a particular path ;
+        imageConcat.writeImage(TempStoragePath);
+        System.out.println(concatenatedImg);
+//        String ans= callTextractwithBufferImage(concatenatedImg,id);
+        String ans=callTextractandGetConfidence(TempStoragePath,id,"tempImg"+"->"+id);
+        imageConcat.DeleteImage(TempStoragePath);
+        return ans;
+    }
+    private static String callTextractwithBufferImage(ByteBuffer concatImg,String id){
+         List<Block> list=textract.getBlockBuffered(concatImg);
+        StringBuilder sb=parsed(list);
+        String text=sb.toString();
+         return analyzeAllDocuments(text,id);
+    }
+    private  static String callTextractandGetConfidence(String path,String id,String name) {
+        List<Block> list = textract.getBlock(path);
+        StringBuilder sb=parsed(list);
+        String text=sb.toString();
+       return analyzeAllDocuments(text,name);
+
+    }
+    private static String analyzeAllDocuments(String text,String name){
         AadharCard aadhar = new AadharCard();
         VoterIdCard votercard = new VoterIdCard();
         PassPort passport = new PassPort();
         DrivingLicence dl = new DrivingLicence();
-        AadharCardBack aadharb = new AadharCardBack();
-        VoterIdCardBack votercardb = new VoterIdCardBack();
-        PassPortBack passportb = new PassPortBack();
-        DrivingLicenceBack dlb = new DrivingLicenceBack();
 
-        List<Block> list = textract.getBlock(path);
-       StringBuilder sb=new StringBuilder();
-        for (Block block : list) {
-            if (block.getBlockType().equals("LINE")) {
-               sb.append(block.getText());
-            }
-        }
-        String text=sb.toString();
         System.out.println( name + " has a Text --" + text);
+
         aadhar.analyzeAadharKey(text);
         passport.analyzePassportKey(text);
         votercard.analyzVoterIdKey(text);
         dl.analyzeDlKey(text);
-//        aadharb.analyzeAadharKey(text);
-//        passportb.analyzePassportKey(text);
-//        votercardb.analyzVoterIdKey(text);
-//        dlb.analyzeDlKey(text);
-
-        return check_Max(aadhar, votercard, passport, dl,aadharb, votercardb, passportb, dlb);
+        return check_Max(aadhar, votercard, passport,dl);
     }
-    private static String check_Max(AadharCard aadhar, VoterIdCard votercard, PassPort passport, DrivingLicence dl,AadharCardBack aadharb, VoterIdCardBack votercardb,
-                                    PassPortBack passportb, DrivingLicenceBack dlb) {
+    private static StringBuilder parsed( List<Block> list){
+        StringBuilder sb=new StringBuilder();
+        for (Block block : list) {
+            if (block.getBlockType().equals("LINE")) {
+//                System.out.println("["+block.getId()+"]"+" "+ block.getText() +"--> "+ block.getConfidence()+", "+ block.getRelationships());
+                if(block.getConfidence()>50.0);
+                sb.append(block.getText());
+            }
+        }
+        return sb;
+    }
+    private static String check_Max(AadharCard aadhar, VoterIdCard votercard, PassPort passport, DrivingLicence dl) {
         int max = 0;
         String ans = "";
         if (aadhar.getConfidence() > max) {
@@ -104,27 +178,11 @@ public class StartWithTextractApplication {
             max = passport.getConfidence();
             ans = passport.getString();
         }
-
-//        if (aadharb.getConfidence() > max) {
-//            max = aadharb.getConfidence();
-//            ans = aadharb.getString();
-//        }
-//        if (votercardb.getConfidence() > max) {
-//            max = votercardb.getConfidence();
-//            ans = votercardb.getString();
-//        }
-//        if (passportb.getConfidence() > max) {
-//            max = passportb.getConfidence();
-//            ans = passportb.getString();
-//        }
-//        if (dlb.getConfidence() > max) {
-//            max = dlb.getConfidence();
-//            ans = dlb.getString();
-//        }
+        System.out.println(ans);
         if (max <=75) {
             return "Invalid Document";
         }
-        System.out.println(ans);
+
         return ans;
     }
     private static String[] splitted(String s) {
@@ -132,46 +190,7 @@ public class StartWithTextractApplication {
         cpath = cpath.replace("\\", "/");
         return cpath.split("/");
     }
-
     private static boolean validFile(String[] arr) {
         return !(arr[arr.length - 1].length() > 14 && arr[arr.length - 1].substring(0, 14).equals("textractResult"));
     }
 }
-//        String cpath = path;
-//        cpath = cpath.replace("\\", "/");
-//        String[] arr = cpath.split("/");
-//        System.out.println(arr[arr.length - 1]);
-//        if (arr[arr.length - 1].length() > 14 && arr[arr.length - 1].substring(0, 14).equals("textractResult")) {
-//            return "TextDocument";
-//        }
-//        String id = arr[arr.length - 2];
-//
-//        String npath = "";
-//        for (int i = 0; i < arr.length - 2; i++) {
-//            npath += arr[i] + "\\";
-//        }
-//        npath += id + "\\textractResult" + i + ".txt";
-//			 try {
-//
-//				 myWriter.write( "Text ---->" + block.getText());
-//				 myWriter.write(System.getProperty( "line.separator" ));
-//			 } catch (IOException e) {
-//				 e.printStackTrace();
-//			 }
-//	 try {
-//		 myWriter.close();
-//	 } catch (IOException e) {
-//		 e.printStackTrace();
-//	 }
-//	 File file = new File(npath);
-//	 try {
-//		 file.createNewFile();
-//	 } catch (IOException e) {
-//		 e.printStackTrace();
-//	 }
-
-//	 try {
-//		 myWriter = new FileWriter(npath);
-//	 } catch (IOException e) {
-//		 e.printStackTrace();
-//	 }

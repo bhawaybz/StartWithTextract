@@ -33,7 +33,6 @@ public class PassPort {
         return this.ConfidenceLevel;
     }
     private  void calculatePassportConditions(String check){
-
         check = check.replaceAll("\\s", "");
         String x=check.toUpperCase(Locale.ROOT);
         StringBuilder sb=new StringBuilder(x);
@@ -45,21 +44,19 @@ public class PassPort {
             for(int j=i+1;j<=sb.length();j++){
                 StringBuilder xsubstr=new StringBuilder(sb.substring(i,j));
                 String text=xsubstr.toString();
-                if(validate.isValidPassport(text) && !(this.KeywordsDone.contains(text))){
-                    KeywordsDone.add(text);
+                if( !(this.KeywordsDone.contains(passportNumber)) && validate.isValidPassport(text) ){
+                    KeywordsDone.add(passportNumber);
                     this.ConfidenceLevel+= keywords.get(passportNumber);
                     System.out.println("Passport Verified" + text);
                 }else{
                     String getc= jw.checkParticularSubstring(text,this.keywords,this.KeywordsDone,this.stateUsed);
                     if(getc.length()>0){
-
                         int cl=keywords.get(getc);
                          if(cl==50 && this.stateUsed==true){
                              break;
                          }else if(cl==50) {
                              this.stateUsed = true;
                          }
-                        System.out.println("PassPort Text Considered" +text +" "+getc);
                         this.ConfidenceLevel+=cl;
                          this.KeywordsDone.add(getc);
                         break;
@@ -72,29 +69,28 @@ public class PassPort {
         //*******************Front Side*******************//
         passportNumber = "MyNumber";
         this.keywords.put(passportNumber, 60);
-        this.keywords.put("REPUBLICOFINDIA", 40);//30 krdo and 20 kuch or add krna
+        this.keywords.put("REPUBLICOFINDIA", 40);
         //*****************************************************
-        keywords.put("PLACEOFISSUE", 15);
-        keywords.put("PASSPORTNO", 50);
-        keywords.put("EMIGRATIONCHECKREQUIRED",35);
+        keywords.put("PLACEOFISSUE", 10);
+        keywords.put("PASSPORTNO", 40);
+        keywords.put("EMIGRATIONCHECKREQUIRED",30);
        fillstates();
     }
     private void fillstates(){
-
-        keywords.put("ANDHRA PRADESH",50);
-        keywords.put("ARUNACHAL PRADESH",50);
+        keywords.put("ANDHRAPRADESH",50);
+        keywords.put("ARUNACHALPRADESH",50);
         keywords.put("ASSAM",50);
         keywords.put("BIHAR",50);
         keywords.put("CHATTISHGARH",50);
         keywords.put("GOA",50);
         keywords.put("GUJARAT",50);
         keywords.put("HARYANA",50);
-        keywords.put("HIMACHAL PRADESH",50);
-        keywords.put("JAMMU AND KASHMIR",50);
+        keywords.put("HIMACHALPRADESH",50);
+        keywords.put("JAMMUANDKASHMIR",50);
         keywords.put("JHARKHAND",50);
         keywords.put("KARNATAKA",50);
         keywords.put("KERALA",50);
-        keywords.put("MADHYA PRADESH",50);
+        keywords.put("MADHYAPRADESH",50);
         keywords.put("MAHARASHTRA",50);
         keywords.put("MANIPUR",50);
         keywords.put("MEGHALYA",50);
@@ -108,12 +104,12 @@ public class PassPort {
         keywords.put("TELANGANA",50);
         keywords.put("TRIPURA",50);
         keywords.put("UTTRAKHAND",50);
-        keywords.put("UTTAR PRADESH",50);
-        keywords.put("WEST BENGAL",50);
+        keywords.put("UTTARPRADESH",50);
+        keywords.put("WESTBENGAL",50);
         keywords.put("ANDAMAN AND NICOBAR ISLAND",50);
         keywords.put("CHANDIGARH",50);
-        keywords.put("DADRA AND NAGAR HAVELI",50);
-        keywords.put("DAMAN AND DIU",50);
+        keywords.put("DADRAANDNAGAR HAVELI",50);
+        keywords.put("DAMANANDDIU",50);
         keywords.put("DELHI",50);
         keywords.put("LAKSHADWEEP",50);
         keywords.put("PUDUCHERRY",50);

@@ -11,12 +11,15 @@ import com.amazonaws.services.textract.model.DetectDocumentTextResult;
 import com.amazonaws.services.textract.model.Document;
 import com.amazonaws.util.IOUtils;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
 import java.io.*;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.List;
 
 public class MyTextract {
-
     private AmazonTextract client;
     public MyTextract(){
         Credentials cred=new Credentials();
@@ -28,6 +31,9 @@ public class MyTextract {
     public List<Block> getBlock(String path){
        return FindBlockUsingTextract(path);
     }
+    public List<Block> getBlockBuffered(ByteBuffer img){
+        return resuestAndgetList(img);
+    }
      private List<Block> FindBlockUsingTextract(String path){
          String document = path;
          ByteBuffer imageBytes = null;
@@ -38,11 +44,14 @@ public class MyTextract {
          } catch (IOException e) {
              e.printStackTrace();
          }
+           return resuestAndgetList(imageBytes);
+     }
+     private List<Block> resuestAndgetList(ByteBuffer imageBytes ){
+
          DetectDocumentTextRequest request = new DetectDocumentTextRequest()
                  .withDocument(new Document()
                          .withBytes(imageBytes));
          DetectDocumentTextResult result = client.detectDocumentText(request);
-         List<Block> l = result.getBlocks();
-         return l;
+         return result.getBlocks();
      }
 }

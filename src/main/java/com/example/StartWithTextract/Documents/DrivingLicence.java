@@ -36,7 +36,8 @@ public class DrivingLicence {
     }
     private  void calculatePassportConditions(String check){
 
-//        check = check.replaceAll("\\s", "");
+        check = check.replaceAll("\\s", "");
+        check = check.replaceAll("[-+^]*", "");
         String x=check.toUpperCase(Locale.ROOT);
         StringBuilder sb=new StringBuilder(x);
         checkAllSubstrings(sb);
@@ -47,9 +48,9 @@ public class DrivingLicence {
             for(int j=i+1;j<=sb.length();j++){
                 StringBuilder xsubstr=new StringBuilder(sb.substring(i,j));
                 String text=xsubstr.toString();
-                if(validate.isValidLicence(text) && !(this.KeywordsDone.contains(text))){
+                if((text.length()==16 || text.length()==15) && validate.isValidLicence(text) && !(this.KeywordsDone.contains(text))){
                     KeywordsDone.add(text);
-//                     System.out.println("Validatd Licence Number -" + text);
+                     System.out.println("Validatd Licence Number -" + text);
                     this.ConfidenceLevel+= keywords.get(licenceNumber);
                 }else{
                     String getc= jw.checkParticularSubstring(text,this.keywords,this.KeywordsDone,this.stateUsed);
@@ -57,13 +58,13 @@ public class DrivingLicence {
 
                         int cl=keywords.get(getc);
                         if(cl==50 && this.stateUsed==true){
-                            System.out.println("break for "+getc);
+//                            System.out.println("break for "+getc);
                             continue;
                         }else if(cl==50) {
                             System.out.println("Mark True");
                             this.stateUsed = true;
                         }
-                        System.out.println("Dl Text Considered" +text +" "+getc);
+                       // System.out.println("Dl Text Considered" +text +" "+getc);
                         this.ConfidenceLevel+=cl;
                         this.KeywordsDone.add(getc);
                         break;
@@ -75,20 +76,20 @@ public class DrivingLicence {
     private void updateKeywords() {
         //********************** FRONT SIDE ********************//
         licenceNumber = "licenceNumber";
-        keywords.put(licenceNumber, 55);
-        keywords.put("INDIAN UNION DRIVING LICENCE", 25);
-        keywords.put("LICENCING AUTHORITY", 10);
-        keywords.put("VALID TILL", 5);
+        keywords.put(licenceNumber, 60);
+        keywords.put("INDIANUNIONDRIVINGLICENCE", 30);
+        keywords.put("LICENCINGAUTHORITY", 10);
+        keywords.put("VALIDTILL", 5);
 // *****************************************Back Side
-        keywords.put("DRIVING LICENCE",25);
+        keywords.put("DRIVINGLICENCE",20);
         keywords.put("Drive",10);
-        keywords.put("MCWG", 5);
-        keywords.put("LMV", 5);
-        keywords.put("TRANSPORT",15);
-        keywords.put("MOTOR",15);
+        keywords.put("MCWG", 10);
+        keywords.put("LMV", 10);
+        keywords.put("TRANSPORT",10);
+        keywords.put("MOTOR",10);
         keywords.put("CYCLE",10);
-        keywords.put("VEHICLE",15);
-        keywords.put("REFERENCE NO",10);
+        keywords.put("VEHICLE",10);
+        keywords.put("REFERENCE NO",5);
         keywords.put("GEAR",10);
          fillstates();
     }

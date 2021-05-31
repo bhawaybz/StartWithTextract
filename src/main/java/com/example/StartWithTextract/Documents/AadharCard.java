@@ -45,10 +45,10 @@ public class AadharCard {
                 StringBuilder xsubstr = new StringBuilder(sb.substring(i, j));
                 String x = xsubstr.toString();
                 if (x.length() == 12 && checkNum(x) && v.validateVerhoeff(x)) {
-                    if (!KeywordsDone.contains(x)) {
+                    if (!KeywordsDone.contains(AadharNumber)) {
+                        System.out.println("Aadhar Verified "+ x);
                         ConfidenceLevel += keywords.get(AadharNumber);
-                        KeywordsDone.add(x);
-                        System.out.println("Aadhar number verified");
+                        KeywordsDone.add(AadharNumber);
                     }
                 } else {
                     String getc= jw.checkParticularSubstring(x,this.keywords,this.KeywordsDone,this.stateUsed);
@@ -61,7 +61,7 @@ public class AadharCard {
                             this.stateUsed = true;
                         }
                         this.ConfidenceLevel+=cl;
-                        System.out.println("Aadhar has text" + getc);
+//                        System.out.println("Aadhar has text" + getc);
                         this.KeywordsDone.add(getc);
                         break;
                     }
@@ -74,7 +74,6 @@ public class AadharCard {
             if (!(s.charAt(i) >= '0' && s.charAt(i) <= '9')) {
                 return false;
             }
-
         }
         return true;
     }
@@ -82,16 +81,15 @@ public class AadharCard {
     private void updateKeywords() {
         //*****************FRONT*********************//
         AadharNumber = "AadharNumber";
-        keywords.put(AadharNumber, 65);
+        keywords.put(AadharNumber, 60);
         keywords.put("GOVERNMENTOFINDIA", 30);
         keywords.put("AADHAAR", 10);
 
         //*************************************************\
-        keywords.put("UNIQUEIDENTIFICATIONAUTHORITYOFINDIA", 35);
-//        keywords.put("ADDRESS", 0.1);
+        keywords.put("UNIQUEIDENTIFICATIONAUTHORITYOFINDIA", 35); // 20 to complete 200
         String link = "www.uidai.gov.in";
         keywords.put(link.toUpperCase(Locale.ROOT), 20);
-        keywords.put("ADDRESS",10);
+//        keywords.put("ADDRESS",10);
         fillstates();
     }
     private void fillstates(){

@@ -1,8 +1,6 @@
 package com.example.StartWithTextract.ValidationAlgos;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 public class ValidatePassport {
     public ValidatePassport(){
     }
