@@ -107,7 +107,6 @@ public class StartWithTextractApplication {
         System.out.println("Checking for "+file+" "+id);
         String ans=concatTheImages(paths,id);
         updateMap(ans,file,id);
-
     }
     private static void updateMap(String ans,String file,String id){
         HashMap<String, ArrayList<String>> map = data.getOrDefault(file, new HashMap<>());
@@ -145,7 +144,6 @@ public class StartWithTextractApplication {
         StringBuilder sb=parsed(list);
         String text=sb.toString();
        return analyzeAllDocuments(text,name);
-
     }
     private static String analyzeAllDocuments(String text,String name){
 
