@@ -1,10 +1,9 @@
-package com.example.StartWithTextract.BusinessLayer.ValidationAlgos;
+package com.example.StartWithTextract.businesslayer.validationalgos;
 
 public class VerhoeffAlgorithm {
-
-     private int[][] d;
-     private int[][] p;
-     private int[] inv;
+     private static int[][] d;
+     private static  int[][] p;
+      private static  int[] inv;
     public VerhoeffAlgorithm(){
         d = new int[][]
                 {
@@ -32,8 +31,7 @@ public class VerhoeffAlgorithm {
                 };
         inv = new int[]{0, 4, 3, 2, 1, 5, 6, 7, 8, 9};
     }
-
-    public  boolean validateVerhoeff(String num) {
+    public static  boolean validateVerhoeff(String num) {
         int c = 0;
         int[] myArray = StringToReversedIntArray(num);
         for (int i = 0; i < myArray.length; i++) {
@@ -41,7 +39,7 @@ public class VerhoeffAlgorithm {
         }
         return (c == 0);
     }
-    private  int[] StringToReversedIntArray(String num) {
+    private static  int[] StringToReversedIntArray(String num) {
         int[] myArray = new int[num.length()];
         for (int i = 0; i < num.length(); i++) {
             myArray[i] = Integer.parseInt(num.substring(i, i + 1));
@@ -49,7 +47,7 @@ public class VerhoeffAlgorithm {
         myArray = Reverse(myArray);
         return myArray;
     }
-    private  int[] Reverse(int[] myArray) {
+    private  static int[] Reverse(int[] myArray) {
         int[] reversed = new int[myArray.length];
         for (int i = 0; i < myArray.length; i++) {
             reversed[i] = myArray[myArray.length - (i + 1)];

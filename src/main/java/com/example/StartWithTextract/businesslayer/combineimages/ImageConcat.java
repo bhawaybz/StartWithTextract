@@ -1,8 +1,11 @@
-package com.example.StartWithTextract.BusinessLayer.CombineImgaes;
+package com.example.StartWithTextract.businesslayer.combineimages;
 
 import com.amazonaws.util.IOUtils;
+import com.example.StartWithTextract.businesslayer.Service;
 import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -12,12 +15,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ImageConcat {
+    private Logger logger= LoggerFactory.getLogger(ImageConcat.class);
     public ImageConcat() {
     }
     public ByteBuffer concat(List<String> paths) {
+        logger.trace("Concatenating the images in " +this.getClass().getSimpleName()+" class" );
         return ConcatUsingOpenCV(paths);
     }
-    Mat dst;
+    private Mat dst;
     private ByteBuffer ConcatUsingOpenCV(List<String> paths) {
         dst = new Mat();
         List<Mat> fimages = makeHeightandWidthSame(paths);
@@ -49,38 +54,12 @@ public class ImageConcat {
         }
         return fimages;
     }
-//    public boolean istextPresent(Mat image) throws IOException, TesseractException {
-//        Tesseract t = new Tesseract();
-//        t.setDatapath("D:\\Java Spring-Boot Projects\\StartWithTextract\\tessdata");
-//        Imgproc.cvtColor(image, image, Imgproc.COLOR_RGB2GRAY);
-//        byte[] ba = Mat2BufferedByteImage(image).array();
-//        ByteArrayInputStream in = new ByteArrayInputStream(ba);
-//        BufferedImage bi = ImageIO.read(in);
-//        String result = "";
-//        result = t.doOCR(bi);
-//        System.out.println("Tesaract has-" + result);
-//        return result.length() > 0;
-//    }
-//    public boolean istextPresent(String path) throws IOException, TesseractException {
-//        ITesseract t = new Tesseract();
-//        t.setDatapath("D:\\Java Spring-Boot Projects\\StartWithTextract\\tessdata");
-//        BufferedImage img = ImageIO.read(new File(path));
-//        System.out.println(img);
-//        String result = "";
-//        System.out.println(path);
-//        String res = t.doOCR(img);
-//        System.out.println("Tessaract Text-" + res);
-//        res = res.replaceAll("\\s", "");
-//        return res.length() > 0;
-//
-//    }
     private ByteBuffer Mat2BufferedByteImage(Mat mat) throws IOException {
         //Encoding the image
         MatOfByte matOfByte = new MatOfByte();
         Imgcodecs.imencode(".jpeg", mat, matOfByte);
         //Storing the encoded Mat in a byte array
         byte[] byteArray = matOfByte.toArray();
-        System.out.println("Size of Image ==>" + byteArray.length);
         while (byteArray.length > 10485760) {
             byteArray = CompressImage(byteArray);
         }
@@ -95,7 +74,6 @@ public class ImageConcat {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ImageIO.write(image, "JPG", baos);
         byte[] data = baos.toByteArray();
-        System.out.println("SIze of Compressed Image -" + data.length);
         return data;
     }
 }

@@ -1,28 +1,27 @@
-package com.example.StartWithTextract.BusinessLayer.ValidationAlgos;
+package com.example.StartWithTextract.businesslayer.validationalgos;
 
 import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ValidateLicence {
-    private HashSet<String> stateCodes;
+    private static HashSet<String> stateCodes;
 
     public ValidateLicence() {
-        this.stateCodes = new HashSet<>();
-        fillStatesCodes();
-    }
-    public boolean isValidLicence(String str) {
 
-        // remove special character between the strings
+    }
+    public static boolean isValidLicence(String str) {
+        stateCodes = new HashSet<>();
+        fillStatesCodes();
         return validLicence(str);
     }
-    private boolean validLicence(String s) {
+    private static boolean validLicence(String s) {
           if(!stateCodes.contains(s.substring(0,2)))return false;
            if(!isNumber(s.substring(2))) return false;
            if(!isYearPresent(s.substring(2))) return false;
         return true;
     }
-  private boolean isNumber(String s){
+  private static boolean isNumber(String s){
         for(int i=0;i<s.length();i++){
             if(!Character.isDigit(s.charAt(i))){
                 return false;
@@ -30,7 +29,7 @@ public class ValidateLicence {
         }
         return true;
   }
-  private boolean isYearPresent(String s){
+  private static boolean isYearPresent(String s){
 //          System.out.println("Checking for "+s);
         for(int i=0;i+4<=s.length() ;i++){
             int j=i+4;
@@ -42,34 +41,21 @@ public class ValidateLicence {
         }
         return false;
   }
-    private boolean isValidLicenseNo(String str) {
-
+    private static boolean isValidLicenseNo(String str) {
         String regex = "^(([A-Z]{2}[0-9]{2})"
                 + "( )|([A-Z]{2}-[0-9]"
                 + "{2}))((19|20)[0-9]"
                 + "[0-9])[0-9]{7}$";
 
-        // Compile the ReGex
         Pattern p = Pattern.compile(regex);
-
-        // If the string is empty
-        // return false
         if (str == null) {
             return false;
         }
-
-        // Find match between given string
-        // and regular expression
-        // uSing Pattern.matcher()
-
         Matcher m = p.matcher(str);
-
-        // Return if the string
-        // matched the ReGex
         return m.matches();
     }
 
-    private void fillStatesCodes() {
+    private static void fillStatesCodes() {
                 stateCodes.add("AN");
                 stateCodes.add("AP");
                 stateCodes.add("AR");
