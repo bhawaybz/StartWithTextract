@@ -25,6 +25,7 @@ public class Controller {
         imgPaths.add(url1);
         imgPaths.add(url2);
         logger.trace(url1);
+
         logger.trace(url2);
 
         return service.getDocumentType(imgPaths);
