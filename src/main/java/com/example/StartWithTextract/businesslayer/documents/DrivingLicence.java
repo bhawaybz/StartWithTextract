@@ -7,16 +7,10 @@ public class DrivingLicence extends Documents {
 
     public DrivingLicence() {
         super();
-
     }
-
-
     @Override
     public boolean validDocumentNumber(String text) {
-
         return ((text.length() == 16 || text.length() == 15) && ValidateLicence.isValidLicence(text));
-
-
     }
 
     @Override

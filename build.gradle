@@ -1,3 +1,5 @@
+import jdk.internal.dynalink.linker.LinkerServices
+
 plugins {
     id 'org.springframework.boot' version '2.3.11.BUILD-SNAPSHOT'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
@@ -17,15 +19,12 @@ ext {
 }
 dependencies {
 
-
-//    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.13.3'
-//    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.13.3'
-
-
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.4.5'
 
-    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
     implementation group: 'com.amazonaws', name: 'aws-java-sdk-bom', version: '1.11.1015', ext: 'pom'//
     // https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-textract
@@ -33,17 +32,11 @@ dependencies {
     // https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-core
     implementation group: 'com.amazonaws', name: 'aws-java-sdk-core', version: '1.11.1015'
 
-    // https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-s3
-    implementation group: 'com.amazonaws', name: 'aws-java-sdk-s3', version: '1.11.1015'
-
     implementation group: 'org.openpnp', name: 'opencv', version: '3.4.2-0'
-    // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
-    implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.0-alpha1'
 
-
-    testImplementation('org.springframework.boot:spring-boot-starter-test') {
-        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-    }
+//    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+//        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+//    }
 }
 
 dependencyManagement {

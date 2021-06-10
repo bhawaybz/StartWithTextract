@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 
-public abstract class Documents {
+public  abstract class Documents {
     protected int confidenceLevel;
     protected HashMap<String, Integer> states;
     protected HashMap<String, Integer> keywords;
@@ -56,6 +56,7 @@ public abstract class Documents {
         }
         return false;
     }
+
     private String checkParticularSubstring(StringBuilder s) {
         //System.out.println("Check for a particular substring for class " + this.getClass().getSimpleName() + " " + s);
         double maxc = 0.0;

@@ -248,4 +248,6 @@ public class StartWithTextractApplication {
     private static boolean validFile(String[] arr) {
         return !(arr[arr.length - 1].length() > 14 && arr[arr.length - 1].substring(0, 14).equals("textractResult"));
     }
+
+
 }

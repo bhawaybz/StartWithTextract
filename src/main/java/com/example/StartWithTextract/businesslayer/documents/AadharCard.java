@@ -37,9 +37,9 @@ public class AadharCard extends Documents {
         this.keywords.put("GOVERNMENTOFINDIA", 30);
         this.keywords.put("AADHAAR", 10);
         // add authority of india
-       //*************************************************\
+        //*************************************************\
         this.keywords.put("UNIQUEIDENTIFICATIONAUTHORITYOFINDIA", 35); // 20 to complete 200
-       String link = "www.uidai.gov.in";
+        String link = "www.uidai.gov.in";
         this.keywords.put(link.toUpperCase(Locale.ROOT), 20);
     }
 }

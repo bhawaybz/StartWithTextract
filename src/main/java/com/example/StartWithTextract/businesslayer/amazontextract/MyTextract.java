@@ -9,7 +9,6 @@ import com.amazonaws.services.textract.model.Document;
 import com.amazonaws.util.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.util.List;

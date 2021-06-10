@@ -80,7 +80,7 @@ public class Service {
     private void analyzeAllDocuments(String text1) {
         ArrayList<String> list = updateText(text1);
         for (String text : list) {
-            if (text.length() >=3) {
+            if (text.length() >= 3) {
                 aadhar.analyzeDoc(text);
                 passport.analyzeDoc(text);
                 votercard.analyzeDoc(text);
@@ -123,5 +123,6 @@ public class Service {
         }
         return ans;
     }
+
 
 }

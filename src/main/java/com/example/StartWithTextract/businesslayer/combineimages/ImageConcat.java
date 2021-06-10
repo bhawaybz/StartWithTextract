@@ -10,36 +10,45 @@ import org.slf4j.LoggerFactory;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ImageConcat {
-    private Logger logger= LoggerFactory.getLogger(ImageConcat.class);
+    private Logger logger = LoggerFactory.getLogger(ImageConcat.class);
+
     public ImageConcat() {
     }
+
     public ByteBuffer concat(List<String> paths) {
-        logger.trace("Concatenating the images in " +this.getClass().getSimpleName()+" class" );
+        logger.trace("Concatenating the images in " + this.getClass().getSimpleName() + " class");
         return ConcatUsingOpenCV(paths);
     }
+
     private Mat dst;
+
     private ByteBuffer ConcatUsingOpenCV(List<String> paths) {
         dst = new Mat();
-        List<Mat> fimages = makeHeightandWidthSame(paths);
-        Core.hconcat(fimages, dst);
         ByteBuffer im = null;
         try {
+            List<Mat> fimages = makeHeightandWidthSame(paths);
+            Core.hconcat(fimages, dst);
             im = Mat2BufferedByteImage(dst);
         } catch (IOException e) {
             e.printStackTrace();
         }
         return im;
     }
-    private List<Mat> makeHeightandWidthSame(List<String> paths) {
+
+    private List<Mat> makeHeightandWidthSame(List<String> paths) throws IOException {
         List<Mat> src = new ArrayList<>();
         int maxw = 0;
         int maxh = 0;
         for (String path : paths) {
+//            byte[] bytes=fetchimg(path);
+//            Mat mat = Imgcodecs.imdecode(new MatOfByte(bytes), Imgcodecs.CV_LOAD_IMAGE_UNCHANGED);
             Mat img = Imgcodecs.imread(path);
             maxw = Math.max(img.width(), maxw);
             maxh = Math.max(img.height(), maxh);
@@ -54,6 +63,15 @@ public class ImageConcat {
         }
         return fimages;
     }
+
+    private byte[] fetchimg(String link, int i) throws IOException {
+        logger.trace("Fetching the image for " + (i + 1) + "ith Url");
+        URL url = new URL(link);
+        InputStream in = new BufferedInputStream(url.openStream());
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        return out.toByteArray();
+    }
+
     private ByteBuffer Mat2BufferedByteImage(Mat mat) throws IOException {
         //Encoding the image
         MatOfByte matOfByte = new MatOfByte();
@@ -68,6 +86,7 @@ public class ImageConcat {
         ByteBuffer imageBytes = ByteBuffer.wrap(IOUtils.toByteArray(in));
         return imageBytes;
     }
+
     private byte[] CompressImage(byte[] arr) throws IOException {
         ByteArrayInputStream in = new ByteArrayInputStream(arr);
         BufferedImage image = ImageIO.read(in);
