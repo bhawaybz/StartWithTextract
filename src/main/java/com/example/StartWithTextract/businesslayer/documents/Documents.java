@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 
-public  abstract class Documents {
+public abstract class Documents {
     protected int confidenceLevel;
     protected HashMap<String, Integer> states;
     protected HashMap<String, Integer> keywords;
@@ -25,6 +25,8 @@ public  abstract class Documents {
 
     protected abstract void updateKeywords();
 
+    protected abstract boolean validDocumentNumber(String text);
+
     public int getConfidence() {
         return this.confidenceLevel;
     }
@@ -33,7 +35,6 @@ public  abstract class Documents {
         checkAllSubstring(new StringBuilder(text));
     }
 
-    protected abstract boolean validDocumentNumber(String text);
 
     protected void checkAllSubstring(StringBuilder text) {
         //System.out.println("Check all SUbstrings -" + text);
@@ -58,7 +59,7 @@ public  abstract class Documents {
     }
 
     private String checkParticularSubstring(StringBuilder s) {
-        //System.out.println("Check for a particular substring for class " + this.getClass().getSimpleName() + " " + s);
+        // System.out.println("Check for a particular substring for class " + this.getClass().getSimpleName() + " " + s);
         double maxc = 0.0;
         String myKey = "";
         for (String keys : this.keywords.keySet()) {

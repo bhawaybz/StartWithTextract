@@ -6,10 +6,12 @@ public class Passport extends Documents {
     public Passport() {
         super();
     }
+
     @Override
     public boolean validDocumentNumber(String text) {
         return (ValidatePassport.isValidPassport(text));
     }
+
     @Override
     protected void updateKeywords() {
         //*******************Front Side*******************//

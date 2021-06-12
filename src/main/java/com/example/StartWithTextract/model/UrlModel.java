@@ -10,9 +10,10 @@ public class UrlModel {
     }
 
     @Override
-    public String toString(){
-        return "Url1- "+this.url1+" /n"+" Url2- "+this.url2+" ";
+    public String toString() {
+        return "Url1- " + this.url1 + " \n " + " Url2- " + this.url2 + " ";
     }
+
     public String getUrl1() {
         return url1;
     }

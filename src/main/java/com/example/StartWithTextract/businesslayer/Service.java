@@ -8,11 +8,8 @@ import com.example.StartWithTextract.businesslayer.documents.DrivingLicence;
 import com.example.StartWithTextract.businesslayer.documents.Passport;
 import com.example.StartWithTextract.businesslayer.documents.VoterCard;
 import nu.pattern.OpenCV;
-
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cache.annotation.Cacheable;
 
 import java.nio.ByteBuffer;
 import java.text.DecimalFormat;
@@ -22,7 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-@Cacheable
+
 public class Service {
     private MyTextract textract;
     private AadharCard aadhar;
@@ -36,6 +33,10 @@ public class Service {
         textract = new MyTextract();
         imageConcat = new ImageConcat();
         OpenCV.loadShared();
+    }
+
+    public String getRawText() {
+        return textract.getRawData();
     }
 
     public String getDocumentType(List<String> images) {
@@ -52,6 +53,7 @@ public class Service {
 
     private String callTextractwithByteBuffer(ByteBuffer concatImg) {
         List<Block> list = textract.getBlockBuffered(concatImg);
+
         logger.trace("Data Received form Textract");
         return parsed(list);
     }
@@ -63,6 +65,7 @@ public class Service {
         passport = new Passport();
         votercard = new VoterCard();
         dl = new DrivingLicence();
+
         for (Block block : list) {
             if (block.getBlockType().equals("LINE")) {
                 String text = block.getText();
@@ -78,8 +81,10 @@ public class Service {
     }
 
     private void analyzeAllDocuments(String text1) {
+
         ArrayList<String> list = updateText(text1);
         for (String text : list) {
+
             if (text.length() >= 3) {
                 aadhar.analyzeDoc(text);
                 passport.analyzeDoc(text);

@@ -12,7 +12,6 @@ public class AadharCard extends Documents {
 
     }
 
-
     @Override
     protected boolean validDocumentNumber(String x) {
 
@@ -36,9 +35,9 @@ public class AadharCard extends Documents {
         this.keywords.put(this.getClass().getSimpleName(), 60);
         this.keywords.put("GOVERNMENTOFINDIA", 30);
         this.keywords.put("AADHAAR", 10);
-        // add authority of india
-        //*************************************************\
-        this.keywords.put("UNIQUEIDENTIFICATIONAUTHORITYOFINDIA", 35); // 20 to complete 200
+
+        //*************************************************
+        this.keywords.put("UNIQUEIDENTIFICATIONAUTHORITYOFINDIA", 35);
         String link = "www.uidai.gov.in";
         this.keywords.put(link.toUpperCase(Locale.ROOT), 20);
     }

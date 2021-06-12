@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.net.MalformedURLException;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -18,8 +18,10 @@ import java.util.List;
 
 public class ImageConcat {
     private Logger logger = LoggerFactory.getLogger(ImageConcat.class);
+    private Mat dst;
 
     public ImageConcat() {
+
     }
 
     public ByteBuffer concat(List<String> paths) {
@@ -27,7 +29,6 @@ public class ImageConcat {
         return ConcatUsingOpenCV(paths);
     }
 
-    private Mat dst;
 
     private ByteBuffer ConcatUsingOpenCV(List<String> paths) {
         dst = new Mat();
@@ -46,10 +47,11 @@ public class ImageConcat {
         List<Mat> src = new ArrayList<>();
         int maxw = 0;
         int maxh = 0;
+        int j = 0;
         for (String path : paths) {
-//            byte[] bytes=fetchimg(path);
-//            Mat mat = Imgcodecs.imdecode(new MatOfByte(bytes), Imgcodecs.CV_LOAD_IMAGE_UNCHANGED);
-            Mat img = Imgcodecs.imread(path);
+            byte[] bytes = fetchimg(path, j);
+            j++;
+            Mat img = Imgcodecs.imdecode(new MatOfByte(bytes), Imgcodecs.CV_LOAD_IMAGE_UNCHANGED);
             maxw = Math.max(img.width(), maxw);
             maxh = Math.max(img.height(), maxh);
             src.add(img);
@@ -65,15 +67,17 @@ public class ImageConcat {
     }
 
     private byte[] fetchimg(String link, int i) throws IOException {
-        logger.trace("Fetching the image for " + (i + 1) + "ith Url");
+        logger.trace("Fetching the image for " + (i + 1) + "th Url");
         URL url = new URL(link);
-        InputStream in = new BufferedInputStream(url.openStream());
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        return out.toByteArray();
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.connect();
+        InputStream in = connection.getInputStream();
+        return IOUtils.toByteArray(in);
     }
 
     private ByteBuffer Mat2BufferedByteImage(Mat mat) throws IOException {
         //Encoding the image
+        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
         MatOfByte matOfByte = new MatOfByte();
         Imgcodecs.imencode(".jpeg", mat, matOfByte);
         //Storing the encoded Mat in a byte array
